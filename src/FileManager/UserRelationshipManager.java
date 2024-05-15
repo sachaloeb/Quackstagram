@@ -14,7 +14,7 @@ import src.observers.Observer;
 
 public class UserRelationshipManager implements Observer{
 
-    private static final Path followingFilePath = Paths.get("data", "following.txt");
+    private static final Path followingFilePath = Paths.get("quack/data", "following.txt");
     private Observable subject;
 
     public UserRelationshipManager(Observable subject){
@@ -112,7 +112,7 @@ public class UserRelationshipManager implements Observer{
     public static String getFollowers(String userName){
         String followers = "";
 
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "following.txt"))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/data", "following.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(userName + ":")) {

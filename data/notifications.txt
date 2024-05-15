@@ -10,3 +10,16 @@ LIKE; test; Mystar; Mystar_2; 2024-05-08 18:14:35
 FOLLOW; test; Mystar; 2024-05-08 18:14:49
 FOLLOW; test; Mystar; 2024-05-08 18:14:56
 FOLLOW; test; Lorin; 2024-05-08 18:15:09
+LIKE; sacha; Zara; Zara_1; 2024-05-15 15:50:52
+LIKE; sacha; Zara; Zara_1; 2024-05-15 15:50:53
+LIKE; sacha; Lorin; Lorin_2; 2024-05-15 15:51:08
+FOLLOW; sacha; Lorin; 2024-05-15 15:51:19
+LIKE; sacha; Lorin; Lorin_1; 2024-05-15 15:51:22
+LIKE; sacha; Lorin; Lorin_1; 2024-05-15 15:51:36
+LIKE; sacha; Lorin; Lorin_1; 2024-05-15 15:51:36
+FOLLOW; sacha; 1; 2024-05-15 15:51:49
+FOLLOW; sacha; Xylo; 2024-05-15 15:52:41
+LIKE; sacha; 1; 1_1; 2024-05-15 15:52:49
+LIKE; sacha; 1; 1_1; 2024-05-15 15:52:52
+LIKE; sacha; Xylo; Xylo_2; 2024-05-15 15:52:52
+LIKE; sacha; Xylo; Xylo_2; 2024-05-15 15:52:54

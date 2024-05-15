@@ -109,7 +109,7 @@ public class QuakstagramHomeUI{
         String[][] tempData = new String[100][]; // Assuming a maximum of 100 posts for simplicity
         int count = 0;
 
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("img", "image_details.txt"))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/img", "image_details.txt"))) {
             String line;
             while ((line = reader.readLine()) != null && count < tempData.length) {
                 if(line.contains("_$SEPARATOR$_")){
@@ -138,7 +138,7 @@ public class QuakstagramHomeUI{
         String[] info = new String[4];
 
         if (followedUsers.contains(details.getUsername())) {
-            String imagePath = "img/uploaded/" + details.getID() + ".png"; // Assuming PNG format
+            String imagePath = "quack/img/uploaded/" + details.getID() + ".png"; // Assuming PNG format
             String description = details.getBio();
             String likes = "Likes: " + details.getLikes();
             String imagePoster = details.getUsername();

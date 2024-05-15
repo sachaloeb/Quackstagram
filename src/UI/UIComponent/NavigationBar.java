@@ -35,15 +35,15 @@ public class NavigationBar extends JFrame {
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.X_AXIS));
         navPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        navPanel.add(createIconButton("img/icons/home.png", "home"));
+        navPanel.add(createIconButton("quack/img/icons/home.png", "home"));
         navPanel.add(Box.createHorizontalGlue());
-        navPanel.add(createIconButton("img/icons/search.png","explore"));
+        navPanel.add(createIconButton("quack/img/icons/search.png","explore"));
         navPanel.add(Box.createHorizontalGlue());
-        navPanel.add(createIconButton("img/icons/add.png","add"));
+        navPanel.add(createIconButton("quack/img/icons/add.png","add"));
         navPanel.add(Box.createHorizontalGlue());
-        navPanel.add(createIconButton("img/icons/heart.png","notification"));
+        navPanel.add(createIconButton("quack/img/icons/heart.png","notification"));
         navPanel.add(Box.createHorizontalGlue());
-        navPanel.add(createIconButton("img/icons/profile.png", "profile"));
+        navPanel.add(createIconButton("quack/img/icons/profile.png", "profile"));
 
         return navPanel;
     }
@@ -81,7 +81,7 @@ public class NavigationBar extends JFrame {
     private String getLoggedInUserName(){
 
         // Read the logged-in user's username from users.txt
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/data", "users.txt"))) {
             String line = reader.readLine();
             if (line != null) {
                 return line.split(":")[0].trim();

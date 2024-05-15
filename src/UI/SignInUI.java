@@ -187,7 +187,7 @@ private boolean verifyCredentials(String username, String password) {
 
 
    private void saveUserInformation(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/users.txt", false))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("quack/data/users.txt", false))) {
             writer.write(user.toString());  // Implement a suitable toString method in User class
         } catch (IOException e) {
             e.printStackTrace();

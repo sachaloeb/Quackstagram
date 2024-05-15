@@ -22,9 +22,9 @@ import src.observers.Observer;
 
 public class ImageLikesManager implements Observer{
 
-    private static final String likesFilePath = "data/likes.txt";
+    private static final String likesFilePath = "quack/data/likes.txt";
 
-    private static final Path detailsPath = Paths.get("img", "image_details.txt");
+    private static final Path detailsPath = Paths.get("quack/img", "image_details.txt");
 
     private String trackingImageId;
 

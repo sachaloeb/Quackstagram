@@ -56,13 +56,13 @@ public class InstagramProfileUI implements Observable{
     private ArrayList<Observer> observers = new ArrayList<Observer>();
     private final NavigationBar navigationBar = new NavigationBar();
 
-    private final Path imageDetailsFilePath = Paths.get("img", "image_details.txt");
+    private final Path imageDetailsFilePath = Paths.get("quack/img", "image_details.txt");
 
-    private final Path tempImageDetailsFilePath = Paths.get("img", "image_details_temp.txt");
+    private final Path tempImageDetailsFilePath = Paths.get("quack/img", "image_details_temp.txt");
 
-    private final String imageDetailsFilePathString = "img/image_details.txt";
+    private final String imageDetailsFilePathString = "quack/img/image_details.txt";
 
-    private final String tempImageDetailsFilePathString = "img/image_details_temp.txt";
+    private final String tempImageDetailsFilePathString = "quack/img/image_details_temp.txt";
 
     public InstagramProfileUI(User user) {
         uiWindow.clearWindow();
@@ -87,7 +87,7 @@ public class InstagramProfileUI implements Observable{
         }
 
         // Step 2: Read following.txt to calculate followers and following
-        Path followingFilePath = Paths.get("data", "following.txt");
+        Path followingFilePath = Paths.get("quack/data", "following.txt");
         try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
             String line;
             while ((line = followingReader.readLine()) != null) {
@@ -112,8 +112,8 @@ public class InstagramProfileUI implements Observable{
 
         String bio = "";
 
-        Path bioDetailsFilePath = Paths.get("data", "userBios.txt");
-        Path usernamesFilePath = Paths.get("data", "credentialsUsernames.txt");
+        Path bioDetailsFilePath = Paths.get("quack/data", "userBios.txt");
+        Path usernamesFilePath = Paths.get("quack/data", "credentialsUsernames.txt");
 
         try (BufferedReader bioDetailsReader = Files.newBufferedReader(bioDetailsFilePath);
              BufferedReader usernameReader = Files.newBufferedReader(usernamesFilePath)
@@ -173,7 +173,7 @@ public class InstagramProfileUI implements Observable{
     
        // Header Panel
         JPanel headerPanel = new JPanel();
-        try (Stream<String> lines = Files.lines(Paths.get("data", "users.txt"))) {
+        try (Stream<String> lines = Files.lines(Paths.get("quack/data", "users.txt"))) {
             isCurrentUser = lines.anyMatch(line -> line.startsWith(currentUser.getUsername() + ":"));
         } catch (IOException e) {
             e.printStackTrace();  // Log or handle the exception as appropriate
@@ -187,7 +187,7 @@ public class InstagramProfileUI implements Observable{
         topHeaderPanel.setBackground(new Color(249, 249, 249));
 
         // Profile image
-        ImageIcon profileIcon = new ImageIcon(new ImageIcon("img/storage/profile/"+currentUser.getUsername()+".png").getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
+        ImageIcon profileIcon = new ImageIcon(new ImageIcon("quack/img/storage/profile/"+currentUser.getUsername()+".png").getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
         JLabel profileImage = new JLabel(profileIcon);
         profileImage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topHeaderPanel.add(profileImage, BorderLayout.WEST);
@@ -286,7 +286,7 @@ private void initializeImageGrid() {
     contentPanel.removeAll(); // Clear existing content
     contentPanel.setLayout(new GridLayout(0, 3, 5, 5)); // Grid layout for image grid
 
-    Path imageDir = Paths.get("img", "uploaded");
+    Path imageDir = Paths.get("quack/img", "uploaded");
     try (Stream<Path> paths = Files.list(imageDir)) {
         paths.filter(path -> path.getFileName().toString().startsWith(currentUser.getUsername() + "_"))
              .forEach(path -> {

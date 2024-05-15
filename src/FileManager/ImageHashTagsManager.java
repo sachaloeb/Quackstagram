@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 
 public class ImageHashTagsManager {
-    private static final String hashTagsFilePath = "data/hashTags.txt";
+    private static final String hashTagsFilePath = "quack/data/hashTags.txt";
 
 
     public static String[] getHashTagsAsArray(String imageID){

@@ -31,9 +31,9 @@ public abstract class StartUI{
     protected JLabel labelUsername = new JLabel("Username    ");
     protected JLabel labelPassword = new JLabel("Password      ");
 
-    protected final String credentialsUsernamesFilePath = "data/credentialsUsernames.txt";
-    protected final String credentialsPasswordsFilePath = "data/credentialsPasswords.txt";
-    protected final String userBiosFilePath = "data/userBios.txt";
+    protected final String credentialsUsernamesFilePath = "quack/data/credentialsUsernames.txt";
+    protected final String credentialsPasswordsFilePath = "quack/data/credentialsPasswords.txt";
+    protected final String userBiosFilePath = "quack/data/userBios.txt";
 
 
 
@@ -51,7 +51,7 @@ public abstract class StartUI{
         lblPhoto.setPreferredSize(new Dimension(80, 80));
         lblPhoto.setHorizontalAlignment(JLabel.CENTER);
         lblPhoto.setVerticalAlignment(JLabel.CENTER);
-        lblPhoto.setIcon(new ImageIcon(new ImageIcon("img/logos/DACS.png").getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH)));
+        lblPhoto.setIcon(new ImageIcon(new ImageIcon("quack/img/logos/DACS.png").getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH)));
         profilePicPanel.add(lblPhoto);
 
         return profilePicPanel;

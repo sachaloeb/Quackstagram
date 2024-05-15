@@ -110,7 +110,7 @@ public class ImageUploadUI{
                 String fileExtension = getFileExtension(file);
                 String newFileName = username + "_" + imageId + "." + fileExtension;
     
-                Path destPath = Paths.get("img", "uploaded", newFileName);
+                Path destPath = Paths.get("quack/img", "uploaded", newFileName);
                 Files.copy(file.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
     
                 // Save the bio and image ID to a text file
@@ -163,7 +163,7 @@ public class ImageUploadUI{
     }
     
     private int getNextImageId(String username) throws IOException {
-        Path storageDir = Paths.get("img", "uploaded"); // Ensure this is the directory where images are saved
+        Path storageDir = Paths.get("quack/img", "uploaded"); // Ensure this is the directory where images are saved
         if (!Files.exists(storageDir)) {
             Files.createDirectories(storageDir);
         }
@@ -190,7 +190,7 @@ public class ImageUploadUI{
     }
     
     private void saveImageInfo(String imageId, String username, String bio) throws IOException {
-        Path infoFilePath = Paths.get("img", "image_details.txt");
+        Path infoFilePath = Paths.get("quack/img", "image_details.txt");
         if (!Files.exists(infoFilePath)) {
             Files.createFile(infoFilePath);
         }
@@ -222,7 +222,7 @@ public class ImageUploadUI{
     }
 
    private String readUsername() throws IOException {
-    Path usersFilePath = Paths.get("data", "users.txt");
+    Path usersFilePath = Paths.get("quack/data", "users.txt");
     try (BufferedReader reader = Files.newBufferedReader(usersFilePath)) {
         String line = reader.readLine();
         if (line != null) {

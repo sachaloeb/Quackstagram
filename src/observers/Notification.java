@@ -41,7 +41,7 @@ public class Notification implements Observer{
                 details.loadDetails(data);
 
                 notification = String.format("%s; %s; %s; %s; %s\n", trackingOperation, User.currentUser, details.getUsername(), data, timestamp);
-                    try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                    try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("quack/data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
                         notificationWriter.write(notification);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -52,7 +52,7 @@ public class Notification implements Observer{
                     if(!UserRelationshipManager.isAlreadyFollowing(User.currentUser, data)){ return; }
 
                     notification = String.format("%s; %s; %s; %s\n", trackingOperation, User.currentUser, data, timestamp);
-                    try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                    try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("quack/data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
                         notificationWriter.write(notification);
                     } catch (IOException e) {
                         e.printStackTrace();

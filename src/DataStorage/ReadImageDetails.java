@@ -12,7 +12,7 @@ public class ReadImageDetails {
     private int likes = 0;
 
     public void loadDetails(String imageID) {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("img", "image_details.txt"))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/img", "image_details.txt"))) {
             String line;
             while ((line = reader.readLine()) != null){
                 if(line.contains(imageID)){

@@ -51,7 +51,7 @@ public class NotificationsUI{
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 
-   try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "notifications.txt"))) {
+   try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/data", "notifications.txt"))) {
     String line;
     while ((line = reader.readLine()) != null) {
         String[] parts = line.split(";");
