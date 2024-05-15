@@ -1,0 +1,12 @@
+LIKE; test; Mystar; Mystar_1; 2024-05-08 18:14:11
+LIKE; test; Xylo; Xylo_1; 2024-05-08 18:14:15
+LIKE; test; Zara; Zara_2; 2024-05-08 18:14:20
+LIKE; test; Zara; Zara_2; 2024-05-08 18:14:20
+LIKE; test; Zara; Zara_2; 2024-05-08 18:14:20
+LIKE; test; Zara; Zara_2; 2024-05-08 18:14:21
+LIKE; test; Zara; Zara_2; 2024-05-08 18:14:23
+LIKE; test; Zara; Zara_2; 2024-05-08 18:14:24
+LIKE; test; Mystar; Mystar_2; 2024-05-08 18:14:35
+FOLLOW; test; Mystar; 2024-05-08 18:14:49
+FOLLOW; test; Mystar; 2024-05-08 18:14:56
+FOLLOW; test; Lorin; 2024-05-08 18:15:09
