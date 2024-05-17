@@ -317,7 +317,7 @@ private void initializeImageGrid() {
 }
 
 private String getImageIdFromPath(Path imagePath){
-    String fileName = imagePath.toString().split("\\\\")[2];
+    String fileName = imagePath.toString().split("\\\\")[0];
     int dotIndex = fileName.lastIndexOf('.');
     return fileName.substring(0, dotIndex);
 }
