@@ -18,3 +18,7 @@ _$SEPARATOR$_
 ImageID: 1_1_$separator$_ Username: 1_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-03-28 15:23:20_$separator$_Likes: 1
 _$SEPARATOR$_
 ImageID: sacha_1_$separator$_ Username: sacha_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-05-15 15:50:23_$separator$_ Likes: 0
+_$SEPARATOR$_
+ImageID: sacha_2_$separator$_ Username: sacha_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-05-17 18:18:00_$separator$_ Likes: 0
+_$SEPARATOR$_
+ImageID: dani_1_$separator$_ Username: dani_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-05-17 18:26:44_$separator$_ Likes: 0
