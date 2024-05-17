@@ -10,9 +10,9 @@ public class SQLDBConnection {
             Connection myCon =DriverManager.getConnection("jdbc:mysql://localhost:3306/QuackDB", "root", "");
 
             Statement stmt = myCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Images"); 
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Images WHERE username='dani'"); 
             while (rs.next()){
-                System.out.println(rs.getString("username"));
+                System.out.println(rs.getString("imageID"));
             }
         }catch(SQLException e){
             e.printStackTrace();
