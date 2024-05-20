@@ -1,11 +1,11 @@
 _$SEPARATOR$_
-ImageID: Lorin_1_$separator$_Username: Lorin_$separator$_Bio: In the cookie jar my hand was not._$separator$_Timestamp: 2023-12-17 19:07:43_$separator$_Likes: 1
+ImageID: Lorin_1_$separator$_Username: Lorin_$separator$_Bio: In the cookie jar my hand was not._$separator$_Timestamp: 2023-12-17 19:07:43_$separator$_Likes: 0
 _$SEPARATOR$_
-ImageID: Lorin_2_$separator$_Username: Lorin_$separator$_Bio: Meditate I must._$separator$_Timestamp: 2023-12-17 19:09:35_$separator$_Likes: 1
+ImageID: Lorin_2_$separator$_Username: Lorin_$separator$_Bio: Meditate I must._$separator$_Timestamp: 2023-12-17 19:09:35_$separator$_Likes: 0
 _$SEPARATOR$_
 ImageID: Xylo_1_$separator$_Username: Xylo_$separator$_Bio: My tea strong as Force is._$separator$_Timestamp: 2023-12-17 19:22:40_$separator$_Likes: 2
 _$SEPARATOR$_
-ImageID: Xylo_2_$separator$_Username: Xylo_$separator$_Bio: Jedi mind trick failed._$separator$_Timestamp: 2023-12-17 19:23:14_$separator$_Likes: 3
+ImageID: Xylo_2_$separator$_Username: Xylo_$separator$_Bio: Jedi mind trick failed._$separator$_Timestamp: 2023-12-17 19:23:14_$separator$_Likes: 2
 _$SEPARATOR$_
 ImageID: Zara_1_$separator$_Username: Zara_$separator$_Bio: Lost my map I have. Oops._$separator$_Timestamp: 2023-12-17 19:24:31_$separator$_Likes: 0
 _$SEPARATOR$_
@@ -14,11 +14,3 @@ _$SEPARATOR$_
 ImageID: Mystar_1_$separator$_Username: Mystar_$separator$_Bio: Cookies gone?_$separator$_Timestamp: 2023-12-17 19:26:50_$separator$_Likes: 0
 _$SEPARATOR$_
 ImageID: Mystar_2_$separator$_Username: Mystar_$separator$_Bio: In my soup a fly is._$separator$_Timestamp: 2023-12-17 19:27:24_$separator$_Likes: 0
-_$SEPARATOR$_
-ImageID: 1_1_$separator$_ Username: 1_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-03-28 15:23:20_$separator$_Likes: 1
-_$SEPARATOR$_
-ImageID: sacha_1_$separator$_ Username: sacha_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-05-15 15:50:23_$separator$_ Likes: 0
-_$SEPARATOR$_
-ImageID: sacha_2_$separator$_ Username: sacha_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-05-17 18:18:00_$separator$_ Likes: 0
-_$SEPARATOR$_
-ImageID: dani_1_$separator$_ Username: dani_$separator$_ Bio: Enter a caption_$separator$_ Timestamp: 2024-05-17 18:26:44_$separator$_ Likes: 0
