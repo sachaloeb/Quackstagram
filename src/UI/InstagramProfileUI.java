@@ -61,10 +61,6 @@ public class InstagramProfileUI implements Observable{
     private ArrayList<Observer> observers = new ArrayList<Observer>();
     private final NavigationBar navigationBar = new NavigationBar();
 
-    private final String imageDetailsFilePathString = "quack/img/image_details.txt";
-
-    private final String tempImageDetailsFilePathString = "quack/img/image_details_temp.txt";
-
     public InstagramProfileUI(User user) {
         uiWindow.clearWindow();
         uiWindow.setVisible(true);
