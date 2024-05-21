@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -31,6 +34,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import src.ImageScalor;
 import src.UI.UIComponent.DefaultHeader;
 import src.UI.UIComponent.NavigationBar;
+
+import static src.DataStorage.SQLDBConnection.getConnection;
 
 public class ImageUploadUI{
 
@@ -190,19 +195,34 @@ public class ImageUploadUI{
     }
     
     private void saveImageInfo(String imageId, String username, String bio) throws IOException {
-        Path infoFilePath = Paths.get("quack/img", "image_details.txt");
-        if (!Files.exists(infoFilePath)) {
-            Files.createFile(infoFilePath);
-        }
-    
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    
-        try (BufferedWriter writer = Files.newBufferedWriter(infoFilePath, StandardOpenOption.APPEND)) {
-            writer.write("_$SEPARATOR$_\n");
-            writer.write(String.format("ImageID: %s_$separator$_ Username: %s_$separator$_ Bio: %s_$separator$_ Timestamp: %s_$separator$_ Likes: 0", imageId, username, bio, timestamp));
-            writer.newLine();
+        String query = "INSERT INTO Images VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, imageId);
+            stmt.setString(2, username);
+            stmt.setString(3, bio);
+            stmt.setString(4, timestamp);
+            stmt.setInt(5, 0);
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-}
+//        Path infoFilePath = Paths.get("quack/img", "image_details.txt");
+//        if (!Files.exists(infoFilePath)) {
+//            Files.createFile(infoFilePath);
+//        }
+//
+//        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//
+//        try (BufferedWriter writer = Files.newBufferedWriter(infoFilePath, StandardOpenOption.APPEND)) {
+//            writer.write("_$SEPARATOR$_\n");
+//            writer.write(String.format("ImageID: %s_$separator$_ Username: %s_$separator$_ Bio: %s_$separator$_ Timestamp: %s_$separator$_ Likes: 0", imageId, username, bio, timestamp));
+//            writer.newLine();
+//        }
+    }
 
 
     private String getFileExtension(File file) {

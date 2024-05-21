@@ -138,11 +138,8 @@ public class SignUpUI extends StartUI {
             if (doesUsernameExist(username)) {
                 JOptionPane.showMessageDialog(uiWindow, "Username already exists. Please choose a different username.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-
-                saveCredentials(username, hashedPassword, bio);
-
-
                 handleProfilePictureUpload();
+                saveCredentials(username, hashedPassword, bio);
                 openSignInUI();
             }
         }
@@ -170,7 +167,8 @@ public class SignUpUI extends StartUI {
     }
 
      // Method to handle profile picture upload
-     private void handleProfilePictureUpload() {
+
+     private void  handleProfilePictureUpload(){
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
         fileChooser.setFileFilter(filter);
@@ -186,7 +184,8 @@ public class SignUpUI extends StartUI {
             File outputFile = new File(profilePhotoStoragePath + username + ".png");
             ImageIO.write(image, "png", outputFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(uiWindow, "Something went wrong. Try again !", "Error", JOptionPane.ERROR_MESSAGE);
+            handleProfilePictureUpload();
         }
     }
     

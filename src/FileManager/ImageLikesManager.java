@@ -15,16 +15,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import src.DataStorage.User;
 import src.observers.Observer;
 
+import static src.DataStorage.SQLDBConnection.getConnection;
+
 public class ImageLikesManager implements Observer{
-
-    private static final String likesFilePath = "quack/data/likes.txt";
-
-    private static final Path detailsPath = Paths.get("quack/img", "image_details.txt");
 
     private String trackingImageId;
 
@@ -58,60 +65,106 @@ public class ImageLikesManager implements Observer{
     // Method to read likes from file
     private static Map<String, Set<String>> readLikes(){
         Map<String, Set<String>> likesMap = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(likesFilePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                String imageID = parts[0];
-                Set<String> users = Arrays.stream(parts[1].split(",")).collect(Collectors.toSet());
-                likesMap.put(imageID, users);
+        String query = "SELECT * FROM Likes";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String imageID = rs.getString("imageID");
+                String username = rs.getString("username");
+
+                likesMap.computeIfAbsent(imageID, k -> new HashSet<>()).add(username);
             }
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
         return likesMap;
+//        Map<String, Set<String>> likesMap = new HashMap<>();
+//        try (BufferedReader reader = new BufferedReader(new FileReader(likesFilePath))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split(":");
+//                String imageID = parts[0];
+//                Set<String> users = Arrays.stream(parts[1].split(",")).collect(Collectors.toSet());
+//                likesMap.put(imageID, users);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return likesMap;
     }
 
     // Method to save likes to file
     private static void manageLike(Map<String, Set<String>> likesMap, String username, String imageID, boolean hasAlreadyLiked){
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(likesFilePath, false));
-            for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
 
-                String currentImageID = entry.getKey();
-                String line = currentImageID + ":" + String.join(",", entry.getValue());
-
-                if(currentImageID.equals(imageID)){
-
-
-
-                    if(!hasAlreadyLiked) {//add like
-
-                        if (entry.getValue().isEmpty()) {
-                            line = line + username;
-                        } else {
-                            line = line + "," + username;
-                        }
-                    }
-                    else{
-
-                        line = deleteUserFromLine(line, username);
-
-                    }
-
+            if (hasAlreadyLiked) {
+                String deleteQuery = "DELETE FROM Likes WHERE imageID = ? AND username = ?";
+                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+                    deleteStmt.setString(1, imageID);
+                    deleteStmt.setString(2, username);
+                    deleteStmt.executeUpdate();
                 }
-
-                writer.write(line);
-
-                if(!line.isEmpty()){
-                    writer.newLine();
+                Set<String> users = likesMap.get(imageID);
+                if (users != null) {
+                    users.remove(username);
                 }
+            } else {
+                String insertQuery = "INSERT INTO Likes VALUES (?, ?)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+                    insertStmt.setString(1, imageID);
+                    insertStmt.setString(2, username);
+                    insertStmt.executeUpdate();
+                }
+                likesMap.computeIfAbsent(imageID, k -> new HashSet<>()).add(username);
             }
-            writer.close();
-        } catch (Exception e) {
-            // TODO: handle exception
+
+            conn.commit(); // Commit transaction
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+//        try {
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(likesFilePath, false));
+//            for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
+//
+//                String currentImageID = entry.getKey();
+//                String line = currentImageID + ":" + String.join(",", entry.getValue());
+//
+//                if(currentImageID.equals(imageID)){
+//
+//
+//
+//                    if(!hasAlreadyLiked) {//add like
+//
+//                        if (entry.getValue().isEmpty()) {
+//                            line = line + username;
+//                        } else {
+//                            line = line + "," + username;
+//                        }
+//                    }
+//                    else{
+//
+//                        line = deleteUserFromLine(line, username);
+//
+//                    }
+//
+//                }
+//
+//                writer.write(line);
+//
+//                if(!line.isEmpty()){
+//                    writer.newLine();
+//                }
+//            }
+//            writer.close();
+//        } catch (Exception e) {
+//            // TODO: handle exception
+//        }
     }
 
     private static String deleteUserFromLine(String line, String username){
@@ -141,53 +194,36 @@ public class ImageLikesManager implements Observer{
         return newLine;
     }
 
-    private void updateLikes(String imageId,boolean hasAlreadyLiked){
-        StringBuilder newContent = generateNewImageDetails(imageId, hasAlreadyLiked);
-        writeNewImageDetails(newContent);
-    }
+    private static void updateLikes(String imageId, boolean hasAlreadyLiked){
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
 
-    private static StringBuilder generateNewImageDetails(String imageId, boolean hasAlreadyLiked){
-        StringBuilder newContent = new StringBuilder();
-
-        try (BufferedReader reader = Files.newBufferedReader(detailsPath)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("ImageID: " + imageId)) {
-                    String imageLine = line;
-                    line = reader.readLine();
-                    while (line != null && !(line.contains("_$SEPARATOR$_"))){
-                        imageLine += "\n" + line;
-                        line = reader.readLine();
-                    }
-                    String[] parts = imageLine.split("\\_\\$separator\\$\\_");
-                    int likes = Integer.parseInt(parts[4].split(": ")[1]);
-
-                    if(hasAlreadyLiked){
-                        likes--; // Increment the likes count
-                    }
-                    else{
-                        likes++; // Increment the likes count
-                    }
-
-                    parts[4] = "Likes: " + likes;
-                    imageLine = String.join("_$separator$_", parts);
-
-                    newContent.append(imageLine);
-                    if(line != null && line.contains("_$SEPARATOR$_")){ newContent.append("\n_$SEPARATOR$_\n"); }
+            // Get current likes count
+            String selectQuery = "SELECT likes FROM Images WHERE imageID = ?";
+            int likes = 0;
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectQuery)) {
+                selectStmt.setString(1, imageId);
+                ResultSet rs = selectStmt.executeQuery();
+                if (rs.next()) {
+                    likes = rs.getInt("likes");
                 }
-                else newContent.append(line).append("\n");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return newContent;
-    }
+            if (hasAlreadyLiked) {
+                likes--;
+            } else {
+                likes++;
+            }
 
-    private static void writeNewImageDetails(StringBuilder newContent){
-        try (BufferedWriter writer = Files.newBufferedWriter(detailsPath)) {
-            writer.write(newContent.toString());
-        } catch (IOException e) {
+            String updateQuery = "UPDATE Images SET likes = ? WHERE imageID = ?";
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
+                updateStmt.setInt(1, likes);
+                updateStmt.setString(2, imageId);
+                updateStmt.executeUpdate();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -195,22 +231,15 @@ public class ImageLikesManager implements Observer{
     private static String[] getLikesAsArray(String imageID){
         Map<String, Set<String>> likesMap = readLikes();
         String line = "";
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(likesFilePath))) {
-            for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
-
-                String currentImageID = entry.getKey();
-                if(currentImageID.equals(imageID))
-                {
-                    line = String.join(",", entry.getValue());
-                    break;
-                }
+        for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
+            String currentImageID = entry.getKey();
+            if(currentImageID.equals(imageID))
+            {
+                line = String.join(",", entry.getValue());
+                break;
             }
-            return (line.split(","));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
+        return (line.split(","));
     }
 
 

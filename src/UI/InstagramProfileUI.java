@@ -243,7 +243,7 @@ public class InstagramProfileUI implements Observable{
             followButton = new FollowButton(currentUser.getUsername());
             addObserver(new UserRelationshipManager(this));
             addObserver((FollowButton)followButton);
-            addObserver(new Notification(Notification.FOLLOW_NOTIFICATION, this));
+            addObserver(new Notification("follow", this));
 
             followButton.addActionListener(e -> {
                 notifyObservers();
@@ -354,7 +354,7 @@ private String getImageIdFromPath(Path imagePath){
     private void createPersonalButtons(Path imagePath, JPanel buttonPanel) {
         JButton addHashTagButton = null;
         JButton deleteImageButton = null;
-        String imageID = getImageIdFromPath(imagePath);
+        String imageID = extractImageIDFromPath(imagePath);
         if(isCurrentUser()){
             deleteImageButton = new JButton("Delete Image");
 
@@ -396,36 +396,35 @@ private String getImageIdFromPath(Path imagePath){
     }
 
     private void deleteImage(Path imagePath) throws IOException {
-        String imageID = getImageIdFromPath(imagePath);
 
-        writeNewTempImageDetailsFile(imageID);
-        writeTempFileToOG();
+//        writeNewTempImageDetailsFile(imageID);
+//        writeTempFileToOG();
 
         deleteFileFromStorage(imagePath);
 
 
     }
 
-    private void writeNewTempImageDetailsFile(String imageID) throws IOException {
+//    private void writeNewTempImageDetailsFile(String imageID) throws IOException {
+//
+//        ProfileUIBackend.EXwriteNewTempImageDetailsFile(imageID,imageDetailsFilePathString,tempImageDetailsFilePathString);
+//    }
 
-        ProfileUIBackend.EXwriteNewTempImageDetailsFile(imageID,imageDetailsFilePathString,tempImageDetailsFilePathString);
-    }
 
 
-
-    private void writeTempFileToOG() throws IOException {
-        try(BufferedReader tempReader = new BufferedReader(new FileReader(tempImageDetailsFilePathString));
-        BufferedWriter ogWriter = new BufferedWriter(new FileWriter(imageDetailsFilePathString))){
-
-            String currentLine;
-
-            while((currentLine = tempReader.readLine()) != null){
-                ogWriter.write(currentLine);
-                ogWriter.newLine();
-            }
-
-        }
-    }
+//    private void writeTempFileToOG() throws IOException {
+//        try(BufferedReader tempReader = new BufferedReader(new FileReader(tempImageDetailsFilePathString));
+//        BufferedWriter ogWriter = new BufferedWriter(new FileWriter(imageDetailsFilePathString))){
+//
+//            String currentLine;
+//
+//            while((currentLine = tempReader.readLine()) != null){
+//                ogWriter.write(currentLine);
+//                ogWriter.newLine();
+//            }
+//
+//        }
+//    }
 
     private void deleteFileFromStorage(Path imagePath) {
 
@@ -437,6 +436,26 @@ private String getImageIdFromPath(Path imagePath){
         if(deletedFile) {
             JOptionPane.showMessageDialog(null, "Successfully deleted image!", "Image Deleted", JOptionPane.INFORMATION_MESSAGE);
         }
+
+        String ImageID=extractImageIDFromPath(imagePath);
+        String query = "DELETE FROM Images WHERE imageID=?";
+        try(Connection connection = SQLDBConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+
+
+            statement.setString(1, ImageID);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String extractImageIDFromPath(Path imagePath) {
+        // Extract the file name from the path
+        String fileName = imagePath.getFileName().toString();
+        String imageID = fileName.substring(0, fileName.lastIndexOf('.'));
+
+        return imageID;
     }
 
 
@@ -478,5 +497,10 @@ private String getImageIdFromPath(Path imagePath){
             if(UserRelationshipManager.isAlreadyFollowing(User.currentUser, trackingUser)){setText("Following");}
             else{ setText("Follow"); }
         }
+    }
+
+    public static void main(String[] args) {
+        Path imageDR=Paths.get("quack/img","Mystar_1.png");
+        System.out.println(extractImageIDFromPath(imageDR));
     }
     }

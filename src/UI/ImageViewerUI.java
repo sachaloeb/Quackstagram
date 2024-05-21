@@ -133,7 +133,7 @@ private JPanel createTopPanel(String username, String timestampString){
         JLabel followedLikes = new JLabel(followedLikesStringBuilder(imageId));
 
         addObserver(new ImageLikesManager(imageId));
-        addObserver(new Notification(Notification.LIKE_NOTIFICATION, this));
+        addObserver(new Notification("like", this));
         addObserver((LikesAndHashTagsLabel)likesAndHashTagsLabel);
 
         JButton likeButton = new JButton("❤");

@@ -1,25 +1,22 @@
 package src.FileManager;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import src.UI.SingletonUiWindow;
+
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static src.DataStorage.SQLDBConnection.getConnection;
 
 
 public class ImageHashTagsManager {
+    private static SingletonUiWindow uiWindow = SingletonUiWindow.getInstance();
 
 
     public static String[] getHashTagsAsArray(String imageID) {
@@ -78,31 +75,46 @@ public class ImageHashTagsManager {
     }
 
     public static void addHashTag(String imageId, String hashTag){
-        Map<String, Set<String>> hashTagsMap = readHashTags();
-        if(!hashTagsMap.containsKey(imageId)){ hashTagsMap.put(imageId, new HashSet<>()); }
-
-        manageHashTags(hashTagsMap, hashTag, imageId);
-    }
-
-    private static void manageHashTags(Map<String, Set<String>> hashTagsMap, String hashTag, String imageID){
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
 
             PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO hashtags VALUES (?, ?)");
-            PreparedStatement deleteStatement = conn.prepareStatement("DELETE FROM hashtags WHERE imageID = ?");
-            deleteStatement.setString(1, imageID);
-            deleteStatement.executeUpdate();
-            hashTagsMap.get(imageID).add(hashTag);
-            for (String tag : hashTagsMap.get(imageID)) {
-                insertStatement.setString(1, tag);
-                insertStatement.setString(2, imageID);
+            try {
+                insertStatement.setString(1, hashTag);
+                insertStatement.setString(2, imageId);
                 insertStatement.executeUpdate();
+                conn.commit();
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(uiWindow, "You already use this hashtag for this post. Choose another one.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+//        Map<String, Set<String>> hashTagsMap = readHashTags();
+//        if(!hashTagsMap.containsKey(imageId)){ hashTagsMap.put(imageId, new HashSet<>()); }
+//
+//        manageHashTags(hashTagsMap, hashTag, imageId);
     }
+
+//    private static void manageHashTags(Map<String, Set<String>> hashTagsMap, String hashTag, String imageID){
+//        try (Connection conn = getConnection()) {
+//            conn.setAutoCommit(false);
+//
+//            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO hashtags VALUES (?, ?)");
+//            PreparedStatement deleteStatement = conn.prepareStatement("DELETE FROM hashtags WHERE imageID = ?");
+//            deleteStatement.setString(1, imageID);
+//            deleteStatement.executeUpdate();
+//            hashTagsMap.get(imageID).add(hashTag);
+//            for (String tag : hashTagsMap.get(imageID)) {
+//                insertStatement.setString(1, tag);
+//                insertStatement.setString(2, imageID);
+//                insertStatement.executeUpdate();
+//            }
+//            conn.commit();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static void main(String[] args) {
         addHashTag("Zara_1", "Amazing");

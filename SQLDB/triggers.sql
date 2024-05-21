@@ -7,9 +7,16 @@ DROP FUNCTION IF EXISTS GetUserTotalLikes;
 
 DELIMITER //
 
-CREATE PROCEDURE UpdateLikes(IN imageId VARCHAR(300))
+CREATE PROCEDURE IncrementLikes(IN imageId VARCHAR(300))
 BEGIN
     UPDATE Images SET likes = likes + 1 WHERE imageID = imageId;
+END
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE DecrementLikes(IN imageId VARCHAR(300))
+BEGIN
+	UPDATE Images SET likes = likes - 1 WHERE imageID = imageId;
 END
 DELIMITER ;
 
@@ -29,7 +36,17 @@ CREATE TRIGGER AfterInsertLike
 AFTER INSERT ON Likes
 FOR EACH ROW
 BEGIN
-    CALL UpdateLikes(NEW.imageID);
+    CALL IncrementLikes(NEW.imageID);
+    SET @total_likes = GetUserTotalLikes((SELECT username FROM Images WHERE imageID = NEW.imageID));
+END
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER AfterDeleteLike
+AFTER DELETE ON Likes
+FOR EACH ROW
+BEGIN
+    CALL DecrementLikes(NEW.imageID);
     SET @total_likes = GetUserTotalLikes((SELECT username FROM Images WHERE imageID = NEW.imageID));
 END
 DELIMITER ;

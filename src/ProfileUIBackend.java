@@ -93,33 +93,33 @@ public class ProfileUIBackend {
 //        }
 //    }
 
-    public static void EXwriteNewTempImageDetailsFile(String imageID,String imageDetailsFilePathString, String tempImageDetailsFilePathString) throws IOException {
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(imageDetailsFilePathString));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempImageDetailsFilePathString, false))){
-
-            String currentLine;
-            String currentImageID = null;
-
-            while ((currentLine = reader.readLine()) != null) {
-
-                if(!currentLine.equals("_$SEPARATOR$_")){
-
-                    int indexOfImageID = 9; //as all lines begin with "Image ID: "
-                    currentImageID = currentLine.substring(indexOfImageID, currentLine.indexOf("_$separator$"));
-
-                    if(!currentImageID.equals(imageID)){
-                        writer.write("_$SEPARATOR$_");
-                        writer.newLine();
-                        writer.write(currentLine);
-                        writer.newLine();
-                    }
-
-                }
-
-            }
-        }
-    }
+//    public static void EXwriteNewTempImageDetailsFile(String imageID,String imageDetailsFilePathString, String tempImageDetailsFilePathString) throws IOException {
+//
+//        try (BufferedReader reader = new BufferedReader(new FileReader(imageDetailsFilePathString));
+//             BufferedWriter writer = new BufferedWriter(new FileWriter(tempImageDetailsFilePathString, false))){
+//
+//            String currentLine;
+//            String currentImageID = null;
+//
+//            while ((currentLine = reader.readLine()) != null) {
+//
+//                if(!currentLine.equals("_$SEPARATOR$_")){
+//
+//                    int indexOfImageID = 9; //as all lines begin with "Image ID: "
+//                    currentImageID = currentLine.substring(indexOfImageID, currentLine.indexOf("_$separator$"));
+//
+//                    if(!currentImageID.equals(imageID)){
+//                        writer.write("_$SEPARATOR$_");
+//                        writer.newLine();
+//                        writer.write(currentLine);
+//                        writer.newLine();
+//                    }
+//
+//                }
+//
+//            }
+//        }
+//    }
 
 
 

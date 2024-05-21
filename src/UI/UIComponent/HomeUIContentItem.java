@@ -86,7 +86,7 @@ public class HomeUIContentItem extends JPanel implements Observable{
 
             addObserver(new ImageLikesManager(imageID));
             addObserver(likesLabel);
-            addObserver(new Notification(Notification.LIKE_NOTIFICATION, this));
+            addObserver(new Notification("like", this));
 
             likeButton.addActionListener(new ActionListener() {
                 @Override
