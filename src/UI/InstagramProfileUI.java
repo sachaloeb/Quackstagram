@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
@@ -33,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
+import src.DataStorage.SQLDBConnection;
 import src.ImageScalor;
 import src.ProfileUIBackend;
 import src.DataStorage.User;
@@ -56,10 +61,6 @@ public class InstagramProfileUI implements Observable{
     private ArrayList<Observer> observers = new ArrayList<Observer>();
     private final NavigationBar navigationBar = new NavigationBar();
 
-    private final Path imageDetailsFilePath = Paths.get("quack/img", "image_details.txt");
-
-    private final Path tempImageDetailsFilePath = Paths.get("quack/img", "image_details_temp.txt");
-
     private final String imageDetailsFilePathString = "quack/img/image_details.txt";
 
     private final String tempImageDetailsFilePathString = "quack/img/image_details_temp.txt";
@@ -73,65 +74,52 @@ public class InstagramProfileUI implements Observable{
         int imageCount = 0;
         int followersCount = 0;
         int followingCount = 0;
-       
-            // Step 1: Read image_details.txt to count the number of images posted by the user
-        try (BufferedReader imageDetailsReader = Files.newBufferedReader(imageDetailsFilePath)) {
-            String line;
-            while ((line = imageDetailsReader.readLine()) != null) {
-                if (line.contains("Username: " + currentUser.getUsername())) {
-                    imageCount++;
-                }
+
+        // Step 1: Read the number of posts a user has
+        String queryImgCount = "SELECT COUNT(*) AS ImgCount FROM Images WHERE username = ?";
+        try(Connection connection = SQLDBConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(queryImgCount)){
+
+            statement.setString(1, currentUser.getUsername());
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                imageCount = resultSet.getInt("ImgCount");
             }
-        } catch (IOException e) {
+
+        }catch(SQLException e){
             e.printStackTrace();
         }
 
         // Step 2: Read following.txt to calculate followers and following
-        Path followingFilePath = Paths.get("quack/data", "following.txt");
-        try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
-            String line;
-            while ((line = followingReader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts.length == 2) {
-                    String username = parts[0].trim();
-                    String[] followingUsers = parts[1].split(";");
-                    if (username.equals(currentUser.getUsername())) {
-                        followingCount = followingUsers.length;
-                    } else {
-                        for (String followingUser : followingUsers) {
-                            if (followingUser.trim().equals(currentUser.getUsername())) {
-                                followersCount++;
-                            }
-                        }
-                    }
-                }
+        String FollowersCountQuery = "SELECT COUNT(*) AS FollowersNB FROM Follows WHERE followed_username = ?";
+        try(Connection connection = SQLDBConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(FollowersCountQuery)){
+
+            statement.setString(1, currentUser.getUsername());
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                followersCount = resultSet.getInt("FollowersNB");
             }
-        } catch (IOException e) {
+
+        }catch(SQLException e){
             e.printStackTrace();
         }
+        String FollowingsCountQuery = "SELECT COUNT(*) AS FollowingsNb FROM Follows WHERE follower_username = ?";
+        try(Connection connection = SQLDBConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(FollowingsCountQuery)){
 
-        String bio = "";
+            statement.setString(1, currentUser.getUsername());
+            ResultSet resultSet = statement.executeQuery();
 
-        Path bioDetailsFilePath = Paths.get("quack/data", "userBios.txt");
-        Path usernamesFilePath = Paths.get("quack/data", "credentialsUsernames.txt");
-
-        try (BufferedReader bioDetailsReader = Files.newBufferedReader(bioDetailsFilePath);
-             BufferedReader usernameReader = Files.newBufferedReader(usernamesFilePath)
-        ) {
-            while ((bio = bioDetailsReader.readLine()) != null) {
-                String username = usernameReader.readLine();
-                if (username.equals(currentUser.getUsername())) {
-                    //bio is already set to the correct one
-                    break; // Exit the loop once the matching bio is found
-                }
+            if (resultSet.next()) {
+                followingCount = resultSet.getInt("FollowingsNb");
             }
-            bio = "";
-        } catch (IOException e) {
+
+        }catch(SQLException e){
             e.printStackTrace();
         }
-
-        currentUser.setBio(bio);
-
 
         currentUser.setFollowersCount(followersCount);
         currentUser.setFollowingCount(followingCount);
@@ -277,10 +265,10 @@ public class InstagramProfileUI implements Observable{
         followButton.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add some vertical padding
     }
 
-public void manageFollowing(String currentUserUsername, String usernameToFollow, Path followingFilePath) throws IOException {
-  
-   ProfileUIBackend.EXmanageFollowing( currentUserUsername,usernameToFollow,followingFilePath);
-}
+//    public void manageFollowing(String currentUserUsername, String usernameToFollow, Path followingFilePath) throws IOException {
+//
+//        ProfileUIBackend.EXmanageFollowing( currentUserUsername,usernameToFollow,followingFilePath);
+//    }
 
 private void initializeImageGrid() {
     contentPanel.removeAll(); // Clear existing content

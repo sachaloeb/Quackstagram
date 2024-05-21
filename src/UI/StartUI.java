@@ -31,10 +31,6 @@ public abstract class StartUI{
     protected JLabel labelUsername = new JLabel("Username    ");
     protected JLabel labelPassword = new JLabel("Password      ");
 
-    protected final String credentialsUsernamesFilePath = "quack/data/credentialsUsernames.txt";
-    protected final String credentialsPasswordsFilePath = "quack/data/credentialsPasswords.txt";
-    protected final String userBiosFilePath = "quack/data/userBios.txt";
-
 
 
 

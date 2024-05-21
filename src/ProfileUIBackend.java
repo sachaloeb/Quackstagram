@@ -59,41 +59,41 @@ public class ProfileUIBackend {
         return false;
     }
 
-    public static void EXmanageFollowing(String currentUserUsername, String usernameToFollow, Path followingFilePath) throws IOException{
-        if (!currentUserUsername.isEmpty()) {
-            boolean found = false;
-            StringBuilder newContent = new StringBuilder();
+//    public static void EXmanageFollowing(String currentUserUsername, String usernameToFollow, Path followingFilePath) throws IOException{
+//        if (!currentUserUsername.isEmpty()) {
+//            boolean found = false;
+//            StringBuilder newContent = new StringBuilder();
+//
+//            // Read and process following.txt
+//            if (Files.exists(followingFilePath)) {
+//                try (BufferedReader reader = Files.newBufferedReader(followingFilePath)) {
+//                    String line;
+//                    while ((line = reader.readLine()) != null) {
+//                        String[] parts = line.split(":");
+//                        if (parts[0].trim().equals(currentUserUsername)) {
+//                            found = true;
+//                            if (!line.contains(usernameToFollow)) {
+//                                line = line.concat(line.endsWith(":") ? "" : "; ").concat(usernameToFollow);
+//                            }
+//                        }
+//                        newContent.append(line).append("\n");
+//                    }
+//                }
+//            }
+//
+//            // If the current user was not found in following.txt, add them
+//            if (!found) {
+//                newContent.append(currentUserUsername).append(": ").append(usernameToFollow).append("\n");
+//            }
+//
+//            // Write the updated content back to following.txt
+//            try (BufferedWriter writer = Files.newBufferedWriter(followingFilePath)) {
+//                writer.write(newContent.toString());
+//            }
+//        }
+//    }
 
-            // Read and process following.txt
-            if (Files.exists(followingFilePath)) {
-                try (BufferedReader reader = Files.newBufferedReader(followingFilePath)) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        String[] parts = line.split(":");
-                        if (parts[0].trim().equals(currentUserUsername)) {
-                            found = true;
-                            if (!line.contains(usernameToFollow)) {
-                                line = line.concat(line.endsWith(":") ? "" : "; ").concat(usernameToFollow);
-                            }
-                        }
-                        newContent.append(line).append("\n");
-                    }
-                }
-            }
-
-            // If the current user was not found in following.txt, add them
-            if (!found) {
-                newContent.append(currentUserUsername).append(": ").append(usernameToFollow).append("\n");
-            }
-
-            // Write the updated content back to following.txt
-            try (BufferedWriter writer = Files.newBufferedWriter(followingFilePath)) {
-                writer.write(newContent.toString());
-            }
-        }
-    }
-
-    public static void EXwriteNewTempImageDetailsFile(String imageID, String tempImageDetailsFilePathString, String imageDetailsFilePathString) throws IOException {
+    public static void EXwriteNewTempImageDetailsFile(String imageID,String imageDetailsFilePathString, String tempImageDetailsFilePathString) throws IOException {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(imageDetailsFilePathString));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempImageDetailsFilePathString, false))){

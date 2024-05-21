@@ -9,6 +9,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import src.DataStorage.SQLDBConnection;
 import src.DataStorage.User;
 
 
@@ -148,37 +153,28 @@ private void onRegisterNowClicked(ActionEvent event) {
 }
 
 private boolean verifyCredentials(String username, String password) {
-    try{
-        BufferedReader readerUsername = new BufferedReader(new FileReader(credentialsUsernamesFilePath));
-        BufferedReader readerPassword = new BufferedReader(new FileReader(credentialsPasswordsFilePath));
-        BufferedReader readerBio = new BufferedReader(new FileReader(userBiosFilePath));
+    String query = "SELECT password, bio FROM Users WHERE username = ?";
+    try(Connection connection = SQLDBConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(query)){
 
 
-        String hashedPassword = hashPassword(password);
+        statement.setString(1, username);
+        ResultSet resultSet = statement.executeQuery();
 
-        String currentUsername;
-        String currentPassword;
-        String currentBio;
+        if (resultSet.next()) {
+            String storedHashedPassword = resultSet.getString("password");
+            String bio = resultSet.getString("bio");
+            String hashedPassword = hashPassword(password);
 
-        while ((currentUsername = readerUsername.readLine()) != null) {
-            currentPassword = readerPassword.readLine();
-            currentBio = readerBio.readLine();
+            if (storedHashedPassword.equals(hashedPassword)) {
+                // Create User object and save information
+                newUser = new User(username, bio, storedHashedPassword);
+                saveUserInformation(newUser);
 
-            if (currentUsername.equals(username) && currentPassword.equals(hashedPassword)) {
-            // Create User object and save information
-        newUser = new User(currentUsername, currentBio, hashedPassword); // Assuming User constructor takes these parameters
-        saveUserInformation(newUser);
-    
-                readerUsername.close();
-                readerPassword.close();
-                readerBio.close();
                 return true;
             }
         }
-        readerUsername.close();
-        readerPassword.close();
-        readerBio.close();
-    } catch (IOException e) {
+    } catch (SQLException e) {
         e.printStackTrace();
     }
     return false;
@@ -192,6 +188,12 @@ private boolean verifyCredentials(String username, String password) {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            SignInUI signInUI = new SignInUI();
+        });
     }
 
 

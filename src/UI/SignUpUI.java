@@ -1,4 +1,6 @@
 package src.UI;
+import src.DataStorage.SQLDBConnection;
+
 import static javax.swing.BoxLayout.*;
 
 import java.awt.BorderLayout;
@@ -13,6 +15,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -143,16 +149,23 @@ public class SignUpUI extends StartUI {
     }
     
     private boolean doesUsernameExist(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(credentialsUsernamesFilePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.equals(username)) {
-                    return true;
-                }
+        String query="SELECT COUNT(*) AS usernameCount FROM Users WHERE username= ?";
+
+        try (Connection connection = SQLDBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt("usernameCount");
+                return count > 0;
             }
-        } catch (IOException e) {
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -178,19 +191,18 @@ public class SignUpUI extends StartUI {
     }
     
     private void saveCredentials(String username, String password, String bio) {
-        try(BufferedWriter writerUsername = new BufferedWriter(new FileWriter(credentialsUsernamesFilePath, true));
-            BufferedWriter writerPassword = new BufferedWriter(new FileWriter(credentialsPasswordsFilePath, true));
-            BufferedWriter writerBio = new BufferedWriter(new FileWriter(userBiosFilePath, true)))
-        {
-            writerUsername.write(username);
-            writerPassword.write(password);
-            writerBio.write(bio);
+        String query = "INSERT INTO Users VALUES (?, ?, ?)";
 
-            writerUsername.newLine();
-            writerPassword.newLine();
-            writerBio.newLine();
+        try (Connection connection = SQLDBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
 
-        } catch (IOException e) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+            statement.setString(3, bio);
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -211,6 +223,11 @@ public class SignUpUI extends StartUI {
         bioPanel.add(txtBio);
 
         return bioPanel;
+    }
+
+    public static void main(String[] args) {
+        SignUpUI s=new SignUpUI();
+        System.out.println(s.doesUsernameExist("sacha"));
     }
 
 }

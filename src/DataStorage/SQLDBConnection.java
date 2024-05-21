@@ -5,18 +5,12 @@ import java.sql.*;
 
 
 public class SQLDBConnection {
-    public static void main(String[] args){
-        try{
-            Connection myCon =DriverManager.getConnection("jdbc:mysql://localhost:3306/QuackDB", "root", "");
 
-            Statement stmt = myCon.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM Images WHERE username='dani'"); 
-            while (rs.next()){
-                System.out.println(rs.getString("imageID"));
-            }
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        
+    private static final String URL = "jdbc:mysql://localhost:3306/QuackDB";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
