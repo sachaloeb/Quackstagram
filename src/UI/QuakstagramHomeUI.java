@@ -7,6 +7,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -19,6 +23,8 @@ import src.FileManager.UserRelationshipManager;
 import src.UI.UIComponent.DefaultHeader;
 import src.UI.UIComponent.HomeUIContentItem;
 import src.UI.UIComponent.NavigationBar;
+
+import static src.DataStorage.SQLDBConnection.getConnection;
 
 public class QuakstagramHomeUI{
     private static SingletonUiWindow uiWindow = SingletonUiWindow.getInstance();
@@ -103,27 +109,31 @@ public class QuakstagramHomeUI{
     private String[][] createSampleData() {
         String currentUser = User.currentUser;
 
-        String followedUsers = UserRelationshipManager.getFollowers(currentUser);
+        String followedUsers = UserRelationshipManager.getFollowings(currentUser);
 
         // Temporary structure to hold the data
         String[][] tempData = new String[100][]; // Assuming a maximum of 100 posts for simplicity
         int count = 0;
 
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/img", "image_details.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null && count < tempData.length) {
-                if(line.contains("_$SEPARATOR$_")){
-                    line = reader.readLine();
+        String query = "SELECT imageID, username FROM Images";
 
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next() && count < tempData.length) {
+                String username = rs.getString("username");
+                if (followedUsers.contains(username)) {
                     ReadImageDetails details = new ReadImageDetails();
-                    details.loadDetails(line.split("\\_\\$separator\\$\\_")[0].split(": ")[1]);
+                    details.loadDetails(rs.getString("imageID"));
 
                     String[] info = generatePostInfo(followedUsers, details);
-                    if (followedUsers.contains(info[0]))
+                    if (followedUsers.contains(info[0])) {
                         tempData[count++] = info;
+                    }
                 }
             }
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 

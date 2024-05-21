@@ -5,7 +5,7 @@ ImageID: Lorin_2_$separator$_Username: Lorin_$separator$_Bio: Meditate I must._$
 _$SEPARATOR$_
 ImageID: Xylo_1_$separator$_Username: Xylo_$separator$_Bio: My tea strong as Force is._$separator$_Timestamp: 2023-12-17 19:22:40_$separator$_Likes: 2
 _$SEPARATOR$_
-ImageID: Xylo_2_$separator$_Username: Xylo_$separator$_Bio: Jedi mind trick failed._$separator$_Timestamp: 2023-12-17 19:23:14_$separator$_Likes: 2
+ImageID: Xylo_2_$separator$_Username: Xylo_$separator$_Bio: Jedi mind trick failed._$separator$_Timestamp: 2023-12-17 19:23:14_$separator$_Likes: 1
 _$SEPARATOR$_
 ImageID: Zara_1_$separator$_Username: Zara_$separator$_Bio: Lost my map I have. Oops._$separator$_Timestamp: 2023-12-17 19:24:31_$separator$_Likes: 0
 _$SEPARATOR$_

@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,9 +16,9 @@ import src.DataStorage.User;
 import src.observers.Observable;
 import src.observers.Observer;
 
-public class UserRelationshipManager implements Observer{
+import static src.DataStorage.SQLDBConnection.getConnection;
 
-    private static final Path followingFilePath = Paths.get("quack/data", "following.txt");
+public class UserRelationshipManager implements Observer{
     private Observable subject;
 
     public UserRelationshipManager(Observable subject){
@@ -23,108 +27,85 @@ public class UserRelationshipManager implements Observer{
 
     // Method to follow a user
     public static void followUser(String follower, String followed){
-        boolean found = false;
-        StringBuilder newContent = new StringBuilder();
 
-        if (Files.exists(followingFilePath)) {
-            try {
-                BufferedReader reader = Files.newBufferedReader(followingFilePath);
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(":");
-                    if (parts[0].equals(follower)) {
-                        found = true;
-                            line = line.concat(line.endsWith(":") ? "" : ";").concat(followed);
-                    }
-                    newContent.append(line).append("\n");
-                }
-                reader.close();
-            }
-            catch (Exception e){}
+        String query = "INSERT INTO Follows (follower_username, followed_username) VALUES (?, ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, follower);
+            stmt.setString(2, followed);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        // If the current user was not found in following.txt, add them
-        if (!found) {
-            newContent.append(follower).append(":").append(followed).append("\n");
-        }
-
-        // Write the updated content back to following.txt
-        try{
-            BufferedWriter writer = Files.newBufferedWriter(followingFilePath);
-            writer.write(newContent.toString());
-            writer.close();
-        } catch(Exception e){};
     }
 
     public static void unfollowUser(String follower, String followed){
-        StringBuilder newContent = new StringBuilder();
+        String query = "DELETE FROM Follows WHERE follower_username = ? AND followed_username = ?";
 
-        if (Files.exists(followingFilePath)) {
-            try {
-                BufferedReader reader = Files.newBufferedReader(followingFilePath);
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(":");
-                    if (parts[0].equals(follower)) {
-                        ArrayList<String> followers = new ArrayList<String>(Arrays.asList(parts[1].split(";")));
-                        followers.remove(followed);
-                        line = parts[0] + ":" + String.join(";", followers);
-                    }
-                    newContent.append(line).append("\n");
-                }
-                reader.close();
-            }
-            catch (Exception e){}
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, follower);
+            stmt.setString(2, followed);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        // Write the updated content back to following.txt
-        try{
-            BufferedWriter writer = Files.newBufferedWriter(followingFilePath);
-            writer.write(newContent.toString());
-            writer.close();
-        } catch(Exception e){};
     }
 
     // Method to check if a user is already following another user
     public static boolean isAlreadyFollowing(String follower, String followed){
-        try (BufferedReader reader = Files.newBufferedReader(followingFilePath)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts[0].equals(follower)) {
-                    String[] followedUsers = parts[1].split(";");
-                    for (String followedUser : followedUsers) {
-                        if (followedUser.equals(followed)) {
-                            return true;
-                        }
-                    }
-                }
+        String query = "SELECT COUNT(*) AS FollowingBool FROM Follows WHERE follower_username = ? AND followed_username = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, follower);
+            stmt.setString(2, followed);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
             }
-            return false;
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
 
     }
 
     // Method to get the list of followers for a user
-    public static String getFollowers(String userName){
-        String followers = "";
+    public static String getFollowers(String username) {
+        StringBuilder followers = new StringBuilder();
+        String query = "SELECT follower_username FROM Follows WHERE followed_username = ?";
 
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/data", "following.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(userName + ":")) {
-                    followers = line.split(":")[1];
-                    break;
-                }
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                followers.append(rs.getString("follower_username")).append(",");
             }
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        return followers.toString();
+    }
 
-        return followers;
+    public static String getFollowings(String username) {
+        StringBuilder followers = new StringBuilder();
+        String query = "SELECT followed_username FROM Follows WHERE follower_username = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                followers.append(rs.getString("followed_username")).append(",");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return followers.toString();
     }
 
     public static String[] getFollowersAsArray(String user){
@@ -137,5 +118,9 @@ public class UserRelationshipManager implements Observer{
         String data = subject.getData();
         if(isAlreadyFollowing(User.currentUser, data)){ unfollowUser(User.currentUser, data); }
         else{ followUser(User.currentUser, data); }
+    }
+
+    public static void main(String[] args) {
+        followUser("sacha", "1");
     }
 }

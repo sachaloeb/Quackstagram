@@ -5,6 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,36 +16,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static src.DataStorage.SQLDBConnection.getConnection;
+
 
 public class ImageHashTagsManager {
-    private static final String hashTagsFilePath = "quack/data/hashTags.txt";
 
 
-    public static String[] getHashTagsAsArray(String imageID){
+    public static String[] getHashTagsAsArray(String imageID) {
         Map<String, Set<String>> likesMap = readHashTags();
         String line = "";
+        for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(hashTagsFilePath))) {
-            for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
-
-                String currentImageID = entry.getKey();
-                if(currentImageID.equals(imageID))
-                {
-                    line = String.join(",", entry.getValue());
-                    break;
-                }
+            String currentImageID = entry.getKey();
+            if (currentImageID.equals(imageID)) {
+                line = String.join(",", entry.getValue());
+                break;
             }
-            return (line.split(","));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
+        return (line.split(","));
     }
 
     public static String getHashTagsString(String imageID){
         String[] separatedHashTags = getHashTagsAsArray(imageID);
 
-        String resultLine = String.join("#", separatedHashTags);
+        String resultLine = String.join("#",separatedHashTags);
         if(!resultLine.equals("")) resultLine = "#" + resultLine;
         
         return resultLine;
@@ -49,18 +47,33 @@ public class ImageHashTagsManager {
 
     private static Map<String, Set<String>> readHashTags(){
         Map<String, Set<String>> likesMap = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(hashTagsFilePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                String imageID = parts[0];
-                Set<String> users = Arrays.stream(parts[1].split(",")).collect(Collectors.toSet());
-                likesMap.put(imageID, users);
+        String query = "SELECT * FROM hashtags";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String imageID = rs.getString("imageID");
+                String keyword = rs.getString("keyword");
+
+                likesMap.computeIfAbsent(imageID, k -> new HashSet<>()).add(keyword);
             }
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+//        try (BufferedReader reader = new BufferedReader(new FileReader(hashTagsFilePath))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split(":");
+//                String imageID = parts[0];
+//                Set<String> users = Arrays.stream(parts[1].split(",")).collect(Collectors.toSet());
+//                likesMap.put(imageID, users);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
         return likesMap;
     }
 
@@ -72,32 +85,26 @@ public class ImageHashTagsManager {
     }
 
     private static void manageHashTags(Map<String, Set<String>> hashTagsMap, String hashTag, String imageID){
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(hashTagsFilePath, false));
-            for (Map.Entry<String, Set<String>> entry : hashTagsMap.entrySet()) {
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
 
-                String currentImageID = entry.getKey();
-                String line = currentImageID + ":" + String.join(",", entry.getValue());
-
-                if(currentImageID.equals(imageID)){
-
-                        if (entry.getValue().isEmpty()) {
-                            line = line + hashTag;
-                        } else {
-                            line = line + "," + hashTag;
-                        }
-
-                }
-
-                writer.write(line);
-
-                if(!line.isEmpty()){
-                    writer.newLine();
-                }
+            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO hashtags VALUES (?, ?)");
+            PreparedStatement deleteStatement = conn.prepareStatement("DELETE FROM hashtags WHERE imageID = ?");
+            deleteStatement.setString(1, imageID);
+            deleteStatement.executeUpdate();
+            hashTagsMap.get(imageID).add(hashTag);
+            for (String tag : hashTagsMap.get(imageID)) {
+                insertStatement.setString(1, tag);
+                insertStatement.setString(2, imageID);
+                insertStatement.executeUpdate();
             }
-            writer.close();
-        } catch (Exception e) {
-            // TODO: handle exception
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        addHashTag("Zara_1", "Amazing");
     }
 }
