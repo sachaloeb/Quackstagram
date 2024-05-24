@@ -46,7 +46,7 @@ public class ImageLikesManager implements Observer{
         Map<String, Set<String>> likesMap = readLikes();
         if(!likesMap.containsKey(trackingImageId)){ likesMap.put(trackingImageId, new HashSet<>()); }
 
-        updateLikes(trackingImageId, hasAlreadyLiked);
+//        updateLikes(trackingImageId, hasAlreadyLiked);
         manageLike(likesMap, User.currentUser, trackingImageId, hasAlreadyLiked);
     }
 

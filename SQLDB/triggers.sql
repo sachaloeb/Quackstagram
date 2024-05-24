@@ -1,63 +1,49 @@
-DROP TRIGGER IF EXISTS AfterInsertLike;
-DROP TRIGGER IF EXISTS AfterInsertFollow;
-DROP PROCEDURE IF EXISTS UpdateLikes;
-DROP FUNCTION IF EXISTS GetUserPostCount;
-DROP FUNCTION IF EXISTS GetUserTotalLikes;
-
-
-DELIMITER //
-
-CREATE PROCEDURE IncrementLikes(IN imageId VARCHAR(300))
-BEGIN
-    UPDATE Images SET likes = likes + 1 WHERE imageID = imageId;
-END
-DELIMITER ;
-
 DELIMITER //
 CREATE PROCEDURE DecrementLikes(IN imageId VARCHAR(300))
-BEGIN
 	UPDATE Images SET likes = likes - 1 WHERE imageID = imageId;
+DELIMITER ;
+
+DELIMITER //
+CREATE FUNCTION GetUserTotalLikes(user VARCHAR(255)) RETURNS int
+    READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE total_likes INT DEFAULT 0;
+    SELECT COALESCE(SUM(likes), 0) INTO total_likes FROM Images WHERE username = user;
+    RETURN total_likes;
 END
 DELIMITER ;
 
 DELIMITER //
-CREATE FUNCTION GetUserTotalLikes(user VARCHAR(255)) RETURNS INT
-DETERMINISTIC READS SQL DATA
-BEGIN
-    DECLARE total_likes INT;
-    SELECT SUM(likes) INTO total_likes FROM Images WHERE username = user;
-    RETURN IFNULL(total_likes, 0);
-END
-DELIMITER ;
-
-
-DELIMITER //
-CREATE TRIGGER AfterInsertLike
-AFTER INSERT ON Likes
-FOR EACH ROW
-BEGIN
-    CALL IncrementLikes(NEW.imageID);
-    SET @total_likes = GetUserTotalLikes((SELECT username FROM Images WHERE imageID = NEW.imageID));
-END
+CREATE PROCEDURE IncrementLikes(IN imageId VARCHAR(300))
+	UPDATE Images SET likes = likes + 1 WHERE imageID = imageId
 DELIMITER ;
 
 DELIMITER //
-CREATE TRIGGER AfterDeleteLike
-AFTER DELETE ON Likes
-FOR EACH ROW
-BEGIN
-    CALL DecrementLikes(NEW.imageID);
-    SET @total_likes = GetUserTotalLikes((SELECT username FROM Images WHERE imageID = NEW.imageID));
+CREATE TRIGGER `AfterInsertFollow` AFTER INSERT ON `Follows` FOR EACH ROW INSERT INTO Notifications (notif_receiver, concerned_user, liked_picture, notif_type, notif_timestamp)
+    VALUES (NEW.followed_username, NEW.follower_username, NULL, 'follow', NOW())
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER `AfterInsertLike` 
+AFTER INSERT ON `Likes` 
+	FOR EACH ROW BEGIN
+		CALL IncrementLikes(NEW.imageID);
+		SET @total_likes = (SELECT GetUserTotalLikes(username) FROM Images WHERE imageID = NEW.imageID);
+		INSERT INTO Notifications (notif_receiver, concerned_user, liked_picture, notif_type, notif_timestamp)
+    	VALUES ((SELECT username FROM Images WHERE imageID = NEW.imageID), NEW.username, NEW.imageID, 'like', NOW());
 END
 DELIMITER ;
 
+DELIMITER //
+CREATE TRIGGER `AfterDeleteLike` AFTER DELETE ON `Likes` FOR EACH ROW BEGIN
+    CALL DecrementLikes(OLD.imageID);
+    SET @total_likes = (SELECT GetUserTotalLikes(username) FROM Images WHERE imageID = OLD.imageID);
+   	DELETE FROM Notifications WHERE liked_picture = OLD.imageID AND concerned_user=OLD.username;
+END
+DELIMITER ;
 
 DELIMITER //
-CREATE TRIGGER AfterInsertFollow
-AFTER INSERT ON Follows
-FOR EACH ROW
-BEGIN
-    INSERT INTO Notifications (notif_receiver, concerned_user, liked_picture, notif_type, notif_timestamp)
-    VALUES (NEW.followed_username, NEW.follower_username, NULL, 'follow', NOW());
-END
+CREATE TRIGGER `AfterDeleteFollow` AFTER DELETE ON `Follows` FOR EACH ROW
+   	DELETE FROM Notifications WHERE notif_receiver = OLD.followed_username AND concerned_user=OLD.follower_username AND notif_type='follow';   	
 DELIMITER ;
