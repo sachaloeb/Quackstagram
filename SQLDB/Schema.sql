@@ -59,12 +59,12 @@ INSERT INTO `Follows` VALUES ('sacha','1'),('Xylo','maya'),('maya','Mystar'),('s
 
 
 CREATE TABLE `Likes` (
-  `imageID` varchar(300) NOT NULL,
+   `imageID` varchar(300) NOT NULL,
   `username` varchar(255) NOT NULL,
   PRIMARY KEY (`imageID`,`username`),
   KEY `username` (`username`),
   CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`username`) REFERENCES `Users` (`username`),
-  CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`imageID`) REFERENCES `Images` (`imageID`)
+  CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`imageID`) REFERENCES `Images` (`imageID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -87,7 +87,7 @@ CREATE TABLE `Notifications` (
   KEY `notifications_ibfk_3` (`liked_picture`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`notif_receiver`) REFERENCES `Users` (`username`),
   CONSTRAINT `notifications_ibfk_2` FOREIGN KEY (`concerned_user`) REFERENCES `Users` (`username`),
-  CONSTRAINT `notifications_ibfk_3` FOREIGN KEY (`liked_picture`) REFERENCES `Images` (`imageID`)
+  CONSTRAINT `notifications_ibfk_3` FOREIGN KEY (`liked_picture`) REFERENCES `Images` (`imageID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -104,7 +104,7 @@ CREATE TABLE `Comments` (
   PRIMARY KEY (`comment_id`),
   KEY `imageID` (`imageID`),
   KEY `username` (`username`),
-  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`imageID`) REFERENCES `Images` (`imageID`),
+  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`imageID`) REFERENCES `Images` (`imageID`) ON DELETE CASCADE,
   CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`username`) REFERENCES `Users` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -119,7 +119,7 @@ CREATE TABLE `hashtags` (
   `imageID` varchar(255) NOT NULL,
   PRIMARY KEY (`keyword`,`imageID`),
   KEY `imageID` (`imageID`),
-  CONSTRAINT `hashtags_ibfk_1` FOREIGN KEY (`imageID`) REFERENCES `Images` (`imageID`)
+  CONSTRAINT `hashtags_ibfk_1` FOREIGN KEY (`imageID`) REFERENCES `Images` (`imageID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
