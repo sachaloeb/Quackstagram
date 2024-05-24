@@ -45,8 +45,6 @@ public class Notification implements Observer{
                 ReadImageDetails details = new ReadImageDetails();
                 details.loadDetails(data);
 
-                saveNotification(details.getUsername(), User.currentUser, trackingOperation, data, timestamp);
-
 //                notification = String.format("%s; %s; %s; %s; %s\n", trackingOperation, User.currentUser, details.getUsername(), data, timestamp);
 //                    try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("quack/data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
 //                        notificationWriter.write(notification);
@@ -57,8 +55,6 @@ public class Notification implements Observer{
                 break;
             case FOLLOW_NOTIFICATION:
                     if(!UserRelationshipManager.isAlreadyFollowing(User.currentUser, data)){ return; }
-
-                    saveNotification(data, User.currentUser, trackingOperation, null, timestamp);
 
 //                    notification = String.format("%s; %s; %s; %s\n", trackingOperation, User.currentUser, data, timestamp);
 //                    try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("quack/data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
@@ -71,22 +67,22 @@ public class Notification implements Observer{
         }
     }
 
-    private void saveNotification(String notifReceiver, String concernedUser, String notifType, String likedPicture, String notifTimestamp) {
-        String query = "INSERT INTO Notifications (notif_receiver, concerned_user, notif_type, liked_picture, notif_timestamp) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, notifReceiver);
-            stmt.setString(2, concernedUser);
-            stmt.setString(3, notifType);
-            stmt.setString(4, likedPicture);
-            stmt.setString(5, notifTimestamp);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void saveNotification(String notifReceiver, String concernedUser, String notifType, String likedPicture, String notifTimestamp) {
+//        String query = "INSERT INTO Notifications (notif_receiver, concerned_user, notif_type, liked_picture, notif_timestamp) VALUES (?, ?, ?, ?, ?)";
+//
+//        try (Connection conn = getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(query)) {
+//            stmt.setString(1, notifReceiver);
+//            stmt.setString(2, concernedUser);
+//            stmt.setString(3, notifType);
+//            stmt.setString(4, likedPicture);
+//            stmt.setString(5, notifTimestamp);
+//
+//            stmt.executeUpdate();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static void main(String[] args) {
 
