@@ -35,6 +35,7 @@ public class ReadImageDetails {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            
         }
 //        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/img", "image_details.txt"))) {
 //            String line;
