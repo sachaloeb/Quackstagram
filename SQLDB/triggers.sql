@@ -1,6 +1,8 @@
+
+
 DELIMITER //
-CREATE PROCEDURE DecrementLikes(IN imageId VARCHAR(300))
-	UPDATE Images SET likes = likes - 1 WHERE imageID = imageId;
+CREATE PROCEDURE DecrementLikes(IN imgid VARCHAR(300))
+	UPDATE Images SET likes = likes - 1 WHERE imageID = imgid
 DELIMITER ;
 
 DELIMITER //
@@ -15,8 +17,8 @@ END
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE IncrementLikes(IN imageId VARCHAR(300))
-	UPDATE Images SET likes = likes + 1 WHERE imageID = imageId
+CREATE PROCEDURE IncrementLikes(IN imgid VARCHAR(300))
+	UPDATE Images SET likes = likes + 1 WHERE imageID = imgid
 DELIMITER ;
 
 DELIMITER //

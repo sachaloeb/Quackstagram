@@ -104,24 +104,28 @@ public class ImageLikesManager implements Observer{
             conn.setAutoCommit(false); // Start transaction
 
             if (hasAlreadyLiked) {
-                String deleteQuery = "DELETE FROM Likes WHERE imageID = ? AND username = ?";
-                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
-                    deleteStmt.setString(1, imageID);
-                    deleteStmt.setString(2, username);
-                    deleteStmt.executeUpdate();
-                }
-                Set<String> users = likesMap.get(imageID);
-                if (users != null) {
-                    users.remove(username);
-                }
+                likesMap.get(imageID).remove(username);
+                deleteLike(username, imageID);
+//                String deleteQuery = "DELETE FROM Likes WHERE imageID = ? AND username = ?";
+//                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+//                    deleteStmt.setString(1, imageID);
+//                    deleteStmt.setString(2, username);
+//                    deleteStmt.executeUpdate();
+//                }
+//                Set<String> users = likesMap.get(imageID);
+//                if (users != null) {
+//                    users.remove(username);
+//                }
             } else {
-                String insertQuery = "INSERT INTO Likes VALUES (?, ?)";
-                try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-                    insertStmt.setString(1, imageID);
-                    insertStmt.setString(2, username);
-                    insertStmt.executeUpdate();
-                }
-                likesMap.computeIfAbsent(imageID, k -> new HashSet<>()).add(username);
+                likesMap.get(imageID).add(username);
+                insertLike(username, imageID);
+//                String insertQuery = "INSERT INTO Likes VALUES (?, ?)";
+//                try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+//                    insertStmt.setString(1, imageID);
+//                    insertStmt.setString(2, username);
+//                    insertStmt.executeUpdate();
+//                }
+//                likesMap.computeIfAbsent(imageID, k -> new HashSet<>()).add(username);
             }
 
             conn.commit(); // Commit transaction
@@ -166,6 +170,32 @@ public class ImageLikesManager implements Observer{
 //            // TODO: handle exception
 //        }
     }
+
+    private static void insertLike(String user, String imageId) {
+        String insertQuery = "INSERT INTO likes VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+            insertStmt.setString(1, imageId);
+            insertStmt.setString(2, user);
+            insertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteLike(String user, String imageId) {
+        String deleteQuery = "DELETE FROM likes WHERE username = ? AND imageID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+            deleteStmt.setString(1, user);
+            deleteStmt.setString(2, imageId);
+            deleteStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     private static String deleteUserFromLine(String line, String username){
 
