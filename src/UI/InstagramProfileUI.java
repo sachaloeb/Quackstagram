@@ -157,7 +157,7 @@ public class InstagramProfileUI implements Observable{
     
        // Header Panel
         JPanel headerPanel = new JPanel();
-        try (Stream<String> lines = Files.lines(Paths.get("quack/data", "users.txt"))) {
+        try (Stream<String> lines = Files.lines(Paths.get("data", "users.txt"))) {
             isCurrentUser = lines.anyMatch(line -> line.startsWith(currentUser.getUsername() + ":"));
         } catch (IOException e) {
             e.printStackTrace();  // Log or handle the exception as appropriate
@@ -171,7 +171,7 @@ public class InstagramProfileUI implements Observable{
         topHeaderPanel.setBackground(new Color(249, 249, 249));
 
         // Profile image
-        ImageIcon profileIcon = new ImageIcon(new ImageIcon("quack/img/storage/profile/"+currentUser.getUsername()+".png").getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
+        ImageIcon profileIcon = new ImageIcon(new ImageIcon("img/storage/profile/"+currentUser.getUsername()+".png").getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
         JLabel profileImage = new JLabel(profileIcon);
         profileImage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topHeaderPanel.add(profileImage, BorderLayout.WEST);
@@ -270,7 +270,7 @@ private void initializeImageGrid() {
     contentPanel.removeAll(); // Clear existing content
     contentPanel.setLayout(new GridLayout(0, 3, 5, 5)); // Grid layout for image grid
 
-    Path imageDir = Paths.get("quack/img", "uploaded");
+    Path imageDir = Paths.get("img", "uploaded");
     try (Stream<Path> paths = Files.list(imageDir)) {
         paths.filter(path -> path.getFileName().toString().startsWith(currentUser.getUsername() + "_"))
              .forEach(path -> {
@@ -496,7 +496,7 @@ private String getImageIdFromPath(Path imagePath){
     }
 
     public static void main(String[] args) {
-        Path imageDR=Paths.get("quack/img","Mystar_1.png");
+        Path imageDR=Paths.get("img","Mystar_1.png");
         System.out.println(extractImageIDFromPath(imageDR));
     }
     }

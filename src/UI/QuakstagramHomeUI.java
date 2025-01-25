@@ -148,7 +148,7 @@ public class QuakstagramHomeUI{
         String[] info = new String[4];
 
         if (followedUsers.contains(details.getUsername())) {
-            String imagePath = "quack/img/uploaded/" + details.getID() + ".png"; // Assuming PNG format
+            String imagePath = "img/uploaded/" + details.getID() + ".png"; // Assuming PNG format
             String description = details.getBio();
             String likes = "Likes: " + details.getLikes();
             String imagePoster = details.getUsername();

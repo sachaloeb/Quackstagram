@@ -47,7 +47,7 @@ public class ProfileUIBackend {
    public static boolean EXisCurrentUser(User currentUser){
         String loggedInUsername = "";
         // Read the logged-in user's username from users.txt
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("quack/data", "users.txt"))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
             String line = reader.readLine();
             if (line != null) {
                 loggedInUsername = line.split(":")[0].trim();

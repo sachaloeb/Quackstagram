@@ -35,7 +35,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class SignUpUI extends StartUI {
     private JTextField txtBio = new JTextField("");
     private JButton btnRegister;
-    private final String profilePhotoStoragePath = "quack/img/storage/profile/";
+    private final String profilePhotoStoragePath = "img/storage/profile/";
     private JButton btnSignIn;
     private JLabel labelBio = new JLabel("Bio                   ");
 

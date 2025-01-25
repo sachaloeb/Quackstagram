@@ -54,7 +54,7 @@ public class HomeUIContentItem extends JPanel implements Observable{
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     try {
-                        String imagePath = "quack/img/uploaded/" + imageID + ".png";
+                        String imagePath = "img/uploaded/" + imageID + ".png";
                         homeUI.displayImage(imagePath); // Call a method to switch to the image view
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
